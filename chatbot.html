@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityBot - Smart City Management Assistant</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* Reset and Base Styles */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #6c6ca8 0%, #e8e6eb 100%);
+            min-height: 100vh;
+        }
+        /* Color Palette */
+        
+         :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1d4ed8;
+            --accent-green: #10b981;
+            --dark-overlay: rgba(0, 0, 0, 0.6);
+            --light-overlay: rgba(255, 255, 255, 0.95);
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --border-light: rgba(255, 255, 255, 0.2);
+            --error-red: #ef4444;
+            --success-green: #22c55e;
+        }
+        /* Header Styles - Same as login page */
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(37, 99, 235, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-green);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-green);
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-green);
+        }
+        /* Main Container */
+        
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 7rem 20px 20px;
+        }
+        /* Chat Container */
+        
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 650px;
+            background: var(--light-overlay);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            padding: 1.5rem;
+            color: var(--text-light);
+            text-align: center;
+            position: relative;
+        }
+        
+        .chat-header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .chat-header .bot-logo {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+        }
+        
+        .chat-header .status {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        /* Chat Area */
+        
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #70728d 0%, #8b8db8 100%);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="%23ffffff" opacity="0.03"/></svg>');
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .bot-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 2px solid var(--accent-green);
+        }
+        
+        .bot-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .message-content {
+            background: white;
+            padding: 1rem 1.25rem;
+            border-radius: 18px 18px 18px 6px;
+            max-width: 80%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .user-message .message-content {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            border-radius: 18px 18px 6px 18px;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .user-message {
+            text-align: right;
+        }
+        /* Problem Grid */
+        
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .problem-btn {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .problem-btn:hover {
+            background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-blue);
+        }
+        
+        .problem-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        /* Language Buttons */
+        
+        .language-btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0.6rem 1.2rem;
+            margin: 0.3rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+        
+        .language-btn:hover {
+            background: linear-gradient(135deg, var(--secondary-blue), #1e40af);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+        /* Typing Indicator */
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 1rem;
+            background: white;
+            border-radius: 18px 18px 18px 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-12px);
+                opacity: 1;
+            }
+        }
+        /* Back Button */
+        
+        .back-btn {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+        /* Footer */
+        
+        .chat-footer {
+            padding: 1rem 1.5rem;
+            background: rgba(248, 250, 252, 0.9);
+            border-top: 1px solid rgba(226, 232, 240, 0.5);
+            text-align: center;
+            font-size: 0.75rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        /* Responsive Design */
+        
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+            .logo {
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+            .logo img {
+                height: 40px;
+                width: 40px;
+            }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--primary-blue);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 999;
+                gap: 0;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .nav-links li {
+                margin: 0;
+                width: 100%;
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+            .nav-links a {
+                display: block;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .main-container {
+                padding: 6rem 15px 15px;
+            }
+            .chat-container {
+                max-width: 100%;
+                height: calc(100vh - 7rem);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 0.75rem;
+            }
+            .logo {
+                font-size: 0.9rem;
+            }
+            .logo img {
+                height: 35px;
+                width: 35px;
+            }
+            .main-container {
+                padding: 6rem 10px 10px;
+            }
+            .chat-area {
+                padding: 1rem;
+            }
+            .problem-grid {
+                gap: 0.5rem;
+            }
+            .problem-btn {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.75rem;
+            }
+            .problem-icon {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header - Same as login page -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.jpg" alt="UrbanCityPortal Logo"> UrbanCityPortal
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Feedback</a></li>
+                <li><a href="chatbot.html">Chatbot</a></li>
+                <li id="dashboardNav"><a href="login.html">Login</a></li>
+                <li><a href="signup.html">Sign Up</a></li>
+            </ul>
+            <script>
+                // Show Dashboard button if logged in, else Login
+                document.addEventListener('DOMContentLoaded', function() {
+                    const dashboardNav = document.getElementById('dashboardNav');
+                    if (!dashboardNav) return;
+                    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+                    if (isLoggedIn) {
+                        dashboardNav.innerHTML = '<a href="dashboard.html">Dashboard</a>';
+                    } else {
+                        dashboardNav.innerHTML = '<a href="login.html">Login</a>';
+                    }
+                });
+            </script>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="chat-container">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="online-indicator"></div>
+                <h1>
+                    <img src="logo.jpg" alt="CityBot" class="bot-logo"> CityBot Assistant
+                </h1>
+                <div class="status">Smart City Management • Online</div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-area" id="chatArea">
+                <div class="message bot-message">
+                    <div class="bot-avatar">
+                        <img src="logo.jpg" alt="CityBot">
+                    </div>
+                    <div class="message-content">
+                        <div>नमस्ते! मी CityBot आहे 👋</div>
+                        <div style="margin-top: 8px;">I'm here to help you with city management issues. Please select a category below:</div>
+
+                        <div class="problem-grid">
+                            <div class="problem-btn" onclick="selectProblem('infrastructure')">
+                                <span class="problem-icon">🏗️</span> Infrastructure
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('safety')">
+                                <span class="problem-icon">🚨</span> Public Safety
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('environment')">
+                                <span class="problem-icon">🌱</span> Environment
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('transportation')">
+                                <span class="problem-icon">🚗</span> Transportation
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('services')">
+                                <span class="problem-icon">🚰</span> Public Services
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('health')">
+                                <span class="problem-icon">🏥</span> Healthcare
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('education')">
+                                <span class="problem-icon">🎓</span> Education
+                            </div>
+                            <div class="problem-btn" onclick="selectProblem('housing')">
+                                <span class="problem-icon">🏠</span> Housing
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="bot-avatar">
+                        <img src="logo.jpg" alt="CityBot">
+                    </div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="chat-footer">
+                <i class="fas fa-shield-alt"></i>
+                <span>Secure • 24/7 Available • Multi-language Support</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProblem = '';
+        let selectedLanguage = '';
+
+        // Mobile menu functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        navLinks.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                navLinks.classList.remove('active');
+                const icon = mobileMenuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Solutions data
+        const solutions = {
+            infrastructure: {
+                en: "🏗️ Infrastructure Solutions:\n\n• Report damaged roads through our mobile app\n• Bridge maintenance schedules are available online\n• Utility outages: Call 1800-CITY-FIX\n• Water supply issues: Contact local ward office\n• Report street light problems via website\n\n📞 Emergency Infrastructure Hotline: 102",
+                hi: "🏗️ अवसंरचना समाधान:\n\n• मोबाइल ऐप के द्वारा खराब सड़कों की रिपोर्ट करें\n• पुल रखरखाव का कार्यक्रम ऑनलाइन उपलब्ध है\n• उपयोगिता बंद: 1800-CITY-FIX पर कॉल करें\n• पानी की आपूर्ति की समस्या: स्थानीय वार्ड कार्यालय से संपर्क करें\n• वेबसाइट के द्वारा स्ट्रीट लाइट की समस्या की रिपोर्ट करें\n\n📞 आपातकालीन अवसंरचना हॉटलाइन: 102",
+                mr: "🏗️ पायाभूत सुविधा समाधाने:\n\n• मोबाईल अॅपद्वारे खराब रस्ते कळवा\n• पूल देखभालीचे वेळापत्रक ऑनलाइन उपलब्ध\n• उपयोगिता बंद: 1800-CITY-FIX वर कॉल करा\n• पाणी पुरवठा समस्या: स्थानिक प्रभाग कार्यालयाशी संपर्क करा\n• वेबसाइटद्वारे रस्त्यावरील दिव्याची समस्या कळवा\n\n📞 आपत्कालीन पायाभूत हॉटलाइन: 102"
+            },
+            safety: {
+                en: "🚨 Public Safety Solutions:\n\n• Report broken street lights immediately\n• Damaged road signs: Use our QR code reporting\n• Hazardous areas: Contact safety department\n• Emergency services: Dial 100 or 108\n• Install CCTV cameras in vulnerable areas\n• Regular safety audits and patrols\n\n📞 Safety Emergency: 100",
+                hi: "🚨 सार्वजनिक सुरक्षा समाधान:\n\n• टूटी हुई स्ट्रीट लाइट तुरंत रिपोर्ट करें\n• क्षतिग्रस्त सड़क के संकेत: हमारे QR कोड रिपोर्टिंग का उपयोग करें\n• खतरनाक क्षेत्र: सुरक्षा विभाग से संपर्क करें\n• आपातकालीन सेवाएं: 100 या 108 डायल करें\n• कमजोर क्षेत्रों में CCTV कैमरा लगवाएं\n• नियमित सुरक्षा ऑडिट और गश्त\n\n📞 सुरक्षा आपातकाल: 100",
+                mr: "🚨 सार्वजनिक सुरक्षा समाधाने:\n\n• तुटलेले रस्त्यावरील दिवे तात्काळ कळवा\n• खराब रस्ते चिन्हे: आमचे QR कोड रिपोर्टिंग वापरा\n• धोकादायक भाग: सुरक्षा विभागाशी संपर्क करा\n• आपत्कालीन सेवा: 100 किंवा 108 डायल करा\n• असुरक्षित भागात CCTV कॅमेरा बसवा\n• नियमित सुरक्षा तपासणी आणि गस्त\n\n📞 सुरक्षा आपत्काल: 100"
+            },
+            environment: {
+                en: "🌱 Environmental Solutions:\n\n• Waste segregation at source is mandatory\n• Report illegal dumping: Green helpline 1800-GREEN\n• Air pollution monitoring stations available\n• Plant more trees in your locality\n• Use public transport to reduce emissions\n• Solar panel installations get subsidies\n\n📞 Environment Helpline: 1800-GREEN",
+                hi: "🌱 पर्यावरणीय समाधान:\n\n• स्रोत पर कचरे का अलगाव अनिवार्य है\n• अवैध डंपिंग की रिपोर्ट करें: ग्रीन हेल्पलाइन 1800-GREEN\n• वायु प्रदूषण निगरानी केंद्र उपलब्ध\n• अपने इलाके में और पेड़ लगाएं\n• उत्सर्जन कम करने के लिए सार्वजनिक परिवहन का उपयोग करें\n• सोलर पैनल स्थापना पर सब्सिडी मिलती है\n\n📞 पर्यावरण हेल्पलाइन: 1800-GREEN",
+                mr: "🌱 पर्यावरणीय समाधाने:\n\n• स्त्रोतावर कचरा वेगळा करणे बंधनकारक\n• बेकायदेशीर कचरा टाकणे कळवा: ग्रीन हेल्पलाइन 1800-GREEN\n• हवा प्रदूषण मॉनिटरिंग केंद्रे उपलब्ध\n• आपल्या परिसरात अधिक झाडे लावा\n• उत्सर्जन कमी करण्यासाठी सार्वजनिक वाहतूक वापरा\n• सौर पॅनेल बसवण्यासाठी अनुदान मिळते\n\n📞 पर्यावरण हेल्पलाइन: 1800-GREEN"
+            },
+            transportation: {
+                en: "🚗 Transportation Solutions:\n\n• Real-time traffic updates on city app\n• Digital parking meters accept UPI payments\n• Bus schedule and routes available online\n• Report traffic signal issues immediately\n• Car-pooling platforms for reduced congestion\n• Metro connectivity expansion plans\n\n📞 Traffic Control: 103",
+                hi: "🚗 परिवहन समाधान:\n\n• सिटी ऐप पर रियल-टाइम ट्रैफिक अपडेट\n• डिजिटल पार्किंग मीटर UPI भुगतान स्वीकार करते हैं\n• बस शेड्यूल और रूट ऑनलाइन उपलब्ध\n• ट्रैफिक सिग्नल की समस्या तुरंत रिपोर्ट करें\n• भीड़ कम करने के लिए कार-पूलिंग प्लेटफॉर्म\n• मेट्रो कनेक्टिविटी विस्तार योजना\n\n📞 ट्रैफिक कंट्रोल: 103",
+                mr: "🚗 वाहतूक समाधाने:\n\n• सिटी अॅपवर रिअल-टाइम ट्रॅफिक अपडेट्स\n• डिजिटल पार्किंग मीटर UPI पेमेंट स्वीकारतात\n• बस वेळापत्रक आणि रूट ऑनलाइन उपलब्ध\n• ट्रॅफिक सिग्नलची समस्या तात्काळ कळवा\n• गर्दी कमी करण्यासाठी कार-पूलिंग प्लॅटफॉर्म\n• मेट्रो कनेक्टिव्हिटी विस्तार योजना\n\n📞 ट्रॅफिक कंट्रोल: 103"
+            },
+            services: {
+                en: "🚰 PublicServices Solutions:\n\n• Water quality testing results published monthly\n• Sewage treatment plant locations mapped\n• Emergency services response time: 15 minutes\n• Register for water tanker during shortages\n• Waste collection schedule notifications\n• 24/7 helpline for service issues\n\n📞 Public Services: 1800-SERVE",
+                hi: "🚰 सार्वजनिक सेवा समाधान:\n\n• पानी की गुणवत्ता जांच के नतीजे मासिक प्रकाशित\n• सीवेज ट्रीटमेंट प्लांट के स्थान मैप किए गए\n• आपातकालीन सेवाओं का जवाब समय: 15 मिनट\n• कमी के दौरान पानी के टैंकर के लिए रजिस्टर करें\n• कचरा संग्रह कार्यक्रम की सूचनाएं\n• सेवा समस्याओं के लिए 24/7 हेल्पलाइन\n\n📞 सार्वजनिक सेवाएं: 1800-SERVE",
+                mr: "🚰 सार्वजनिक सेवा समाधाने:\n\n• पाण्याच्या गुणवत्तेच्या चाचणी निकाल मासिक प्रसिद्ध\n• सांडपाणी प्रक्रिया केंद्रांची स्थाने मॅप केली\n• आपत्कालीन सेवांचा प्रतिसाद वेळ: 15 मिनिटे\n• टंचाईच्या वेळी पाणी टँकरसाठी नोंदणी करा\n• कचरा गोळा करण्याच्या वेळापत्रकाच्या सूचना\n• सेवा समस्यांसाठी 24/7 हेल्पलाइन\n\n📞 सार्वजनिक सेवा: 1800-SERVE"
+            },
+            health: {
+                en: "🏥 Healthcare Solutions:\n\n• Free health checkups at government hospitals\n• Ambulance service: Dial 108\n• Vaccination schedules available online\n• Mental health counseling hotline\n• Blood bank locations and availability\n• Telemedicine consultations available\n\n📞 Health Emergency: 108",
+                hi: "🏥 स्वास्थ्य सेवा समाधान:\n\n• सरकारी अस्पतालों में मुफ्त स्वास्थ्य जांच\n• एम्बुलेंस सेवा: 108 डायल करें\n• टीकाकरण कार्यक्रम ऑनलाइन उपलब्ध\n• मानसिक स्वास्थ्य परामर्श हॉटलाइन\n• ब्लड बैंक के स्थान और उपलब्धता\n• टेलीमेडिसिन परामर्श उपलब्ध\n\n📞 स्वास्थ्य आपातकाल: 108",
+                mr: "🏥 आरोग्य सेवा समाधाने:\n\n• सरकारी रुग्णालयात मोफत आरोग्य तपासणी\n• रुग्णवाहिका सेवा: 108 डायल करा\n• लसीकरण वेळापत्रक ऑनलाइन उपलब्ध\n• मानसिक आरोग्य सल्ला हॉटलाइन\n• रक्तपेढींची स्थाने आणि उपलब्धता\n• टेलीमेडिसिन सल्ला उपलब्ध\n\n📞 आरोग्य आपत्काल: 108"
+            },
+            education: {
+                en: "🎓 Education Solutions:\n\n• Online school admission portal available\n• Free digital literacy programs\n• Scholarship information and applications\n• Library services and book reservations\n• Adult education evening classes\n• Skill development training programs\n\n📞 Education Helpline: 1800-EDU",
+                hi: "🎓 शिक्षा समाधान:\n\n• ऑनलाइन स्कूल प्रवेश पोर्टल उपलब्ध\n• मुफ्त डिजिटल साक्षरता कार्यक्रम\n• छात्रवृत्ति की जानकारी और आवेदन\n• पुस्तकालय सेवाएं और पुस्तक आरक्षण\n• वयस्क शिक्षा की शाम की कक्षाएं\n• कौशल विकास प्रशिक्षण कार्यक्रम\n\n📞 शिक्षा हेल्पलाइन: 1800-EDU",
+                mr: "🎓 शिक्षण समाधाने:\n\n• ऑनलाइन शाळा प्रवेश पोर्टल उपलब्ध\n• मोफत डिजिटल साक्षरता कार्यक्रम\n• शिष्यवृत्तीची माहिती आणि अर्ज\n• ग्रंथालय सेवा आणि पुस्तक आरक्षण\n• प्रौढ शिक्षणाचे संध्याकाळचे वर्ग\n• कौशल्य विकास प्रशिक्षण कार्यक्रम\n\n📞 शिक्षण हेल्पलाइन: 1800-EDU"
+            },
+            housing: {
+                en: "🏠 Housing Solutions:\n\n• Affordable housing scheme applications\n• Property tax calculation and payment\n• Building permit and approval process\n• Housing loan assistance programs\n• Slum rehabilitation projects\n• Real estate verification services\n\n📞 Housing Department: 1800-HOME",
+                hi: "🏠 आवास समाधान:\n\n• किफायती आवास योजना के आवेदन\n• संपत्ति कर गणना और भुगतान\n• भवन अनुमति और अनुमोदन प्रक्रिया\n• आवास ऋण सहायता कार्यक्रम\n• झुग्गी पुनर्वास परियोजनाएं\n• रियल एस्टेट सत्यापन सेवाएं\n\n📞 आवास विभाग: 1800-HOME",
+                mr: "🏠 गृहनिर्माण समाधाने:\n\n• परवडणारी गृहनिर्माण योजना अर्ज\n• मालमत्ता कर गणना आणि भरणा\n• इमारत परवानगी आणि मंजुरी प्रक्रिया\n• गृहकर्ज सहायता कार्यक्रम\n• झोपडपट्टी पुनर्वसन प्रकल्प\n• रिअल इस्टेट पडताळणी सेवा\n\n📞 गृहनिर्माण विभाग: 1800-HOME"
+            }
+        };
+
+        function selectProblem(problem) {
+            currentProblem = problem;
+
+            // Show typing indicator
+            document.getElementById('typingIndicator').style.display = 'flex';
+
+            setTimeout(() => {
+                // Hide typing indicator
+                document.getElementById('typingIndicator').style.display = 'none';
+
+                // Add user message
+                addMessage('user', `Selected: ${problem.charAt(0).toUpperCase() + problem.slice(1)}`);
+
+                setTimeout(() => {
+                    // Show language selection
+                    showLanguageSelection();
+                }, 500);
+            }, 1500);
+        }
+
+        function showLanguageSelection() {
+            const langMessage = `
+                <div>Please select your preferred language:</div>
+                <div style="margin-top: 10px;">
+                    <button class="language-btn" onclick="selectLanguage('en')">🇺🇸 English</button>
+                    <button class="language-btn" onclick="selectLanguage('hi')">🇮🇳 हिंदी</button>
+                    <button class="language-btn" onclick="selectLanguage('mr')">🇮🇳 मराठी</button>
+                </div>
+            `;
+            addMessage('bot', langMessage);
+        }
+
+        function selectLanguage(lang) {
+            selectedLanguage = lang;
+
+            const langNames = {
+                en: 'English',
+                hi: 'हिंदी',
+                mr: 'मराठी'
+            };
+            addMessage('user', `Selected language: ${langNames[lang]}`);
+
+            // Show typing indicator
+            document.getElementById('typingIndicator').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('typingIndicator').style.display = 'none';
+                showSolution();
+            }, 2000);
+        }
+
+        function showSolution() {
+            const solution = solutions[currentProblem][selectedLanguage];
+            const solutionMessage = `
+                <div style="white-space: pre-line; line-height: 1.5;">${solution}</div>
+                <button class="back-btn" onclick="goBack()">← Back to Categories</button>
+            `;
+            addMessage('bot', solutionMessage);
+        }
+
+        function goBack() {
+            currentProblem = '';
+            selectedLanguage = '';
+
+            const welcomeMessage = `
+                <div>How can I help you today? Please select a category:</div>
+                <div class="problem-grid" style="margin-top: 10px;">
+                    <div class="problem-btn" onclick="selectProblem('infrastructure')">
+                        <span class="problem-icon">🏗️</span>
+                        Infrastructure
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('safety')">
+                        <span class="problem-icon">🚨</span>
+                        Public Safety
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('environment')">
+                        <span class="problem-icon">🌱</span>
+                        Environment
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('transportation')">
+                        <span class="problem-icon">🚗</span>
+                        Transportation
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('services')">
+                        <span class="problem-icon">🚰</span>
+                        Public Services
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('health')">
+                        <span class="problem-icon">🏥</span>
+                        Healthcare
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('education')">
+                        <span class="problem-icon">🎓</span>
+                        Education
+                    </div>
+                    <div class="problem-btn" onclick="selectProblem('housing')">
+                        <span class="problem-icon">🏠</span>
+                        Housing
+                    </div>
+                </div>
+            `;
+            addMessage('bot', welcomeMessage);
+        }
+
+        function addMessage(sender, content) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+
+            if (sender === 'bot') {
+                messageDiv.innerHTML = `
+                    <div class="bot-avatar"> <img src="logo.jpg" alt="UrbanCityPortal Logo" style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%; margin-right: 10px;"></div>
+                    <div class="message-content">${content}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                `;
+            }
+
+            // Insert before typing indicator
+            const typingIndicator = document.getElementById('typingIndicator');
+            chatArea.insertBefore(messageDiv, typingIndicator);
+
+            // Scroll to bottom
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // Add some initial animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add pulse animation to online status
+            const onlineStatus = document.querySelector('.online-status');
+            setInterval(() => {
+                onlineStatus.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    onlineStatus.style.transform = 'scale(1)';
+                }, 200);
+            }, 3000);
+
+            // Add hover effects to problem buttons
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.classList.contains('problem-btn')) {
+                    e.target.style.transform = 'scale(1.05)';
+                }
+            });
+
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.classList.contains('problem-btn')) {
+                    e.target.style.transform = 'scale(1)';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

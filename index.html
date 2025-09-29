@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrbanCityPortal - City Management & Community Engagement</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* Reset and Base Styles */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+        /* Color Palette */
+        
+         :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1d4ed8;
+            --accent-green: #10b981;
+            --dark-overlay: rgba(0, 0, 0, 0.6);
+            --light-overlay: rgba(255, 255, 255, 0.95);
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --border-light: rgba(255, 255, 255, 0.2);
+        }
+        /* Header Styles - IMPROVED */
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(37, 99, 235, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 0.75rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header.scrolled {
+            background: rgba(37, 99, 235, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            flex-shrink: 0;
+            z-index: 1001;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-green);
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover img {
+            transform: scale(1.05);
+            border-color: #ffffff;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links li {
+            margin: 0;
+        }
+        
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            white-space: nowrap;
+            position: relative;
+            display: block;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+        
+        .nav-links a.login-btn {
+            background: var(--accent-green);
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .nav-links a.login-btn:hover {
+            background: #059669;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-green);
+        }
+        /* Desktop Navigation Adjustments */
+        
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+            .nav-links {
+                gap: 0.25rem;
+            }
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.6rem;
+            }
+            .logo {
+                font-size: 1.1rem;
+            }
+            .logo img {
+                height: 45px;
+                width: 45px;
+            }
+        }
+        /* Large Desktop Optimization */
+        
+        @media (min-width: 1201px) {
+            .nav-links {
+                gap: 1rem;
+            }
+            .nav-links a {
+                font-size: 1rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+        /* Hero Section */
+        
+        .hero {
+            height: 100vh;
+            background: linear-gradient(var(--dark-overlay), var(--dark-overlay)), url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-light);
+            position: relative;
+            margin-top: 80px;
+            /* Account for fixed header */
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--accent-green);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 185, 129, 0.3);
+        }
+        
+        .cta-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 185, 129, 0.4);
+        }
+        /* How It Works Section */
+        
+        .how-it-works {
+            padding: 5rem 0;
+            background: var(--light-overlay);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-dark);
+        }
+        
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .step-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .step-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        /* Features Section */
+        
+        .features {
+            padding: 5rem 0;
+            background: #f8fafc;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-green);
+            color: white;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-content h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .feature-content p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        /* Contact Form Section */
+        
+        .contact {
+            padding: 5rem 0;
+            background: var(--primary-blue);
+            color: var(--text-light);
+        }
+        
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .contact .section-title {
+            color: var(--text-light);
+        }
+        
+        .contact-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-light);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .submit-btn {
+            background: var(--accent-green);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        /* Footer */
+        
+        .footer {
+            background: #1e293b;
+            color: var(--text-light);
+            padding: 3rem 0 1rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--accent-green);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--accent-green);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+        }
+        /* Animations */
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Mobile Responsive Design - IMPROVED */
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.5rem 0;
+            }
+            .nav-container {
+                padding: 0 1rem;
+            }
+            .logo {
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+            .logo img {
+                height: 40px;
+                width: 40px;
+            }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--primary-blue);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 999;
+                gap: 0;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .nav-links li {
+                margin: 0;
+                width: 100%;
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+            .nav-links a {
+                display: block;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+            }
+            .nav-links a.login-btn {
+                background: var(--accent-green);
+                margin: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                width: calc(100% - 2rem);
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .hero {
+                background-attachment: scroll;
+                margin-top: 70px;
+                min-height: calc(100vh - 70px);
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 0.75rem;
+            }
+            .logo {
+                font-size: 0.9rem;
+            }
+            .logo img {
+                height: 35px;
+                width: 35px;
+            }
+            .hero-content {
+                padding: 1rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 1.8rem;
+            }
+            .steps-grid,
+            .features-grid {
+                gap: 1.5rem;
+            }
+            .step-card,
+            .feature-item {
+                padding: 1.5rem;
+            }
+            .contact-container {
+                padding: 0 1rem;
+            }
+            .contact-form {
+                padding: 1.5rem;
+            }
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                padding: 0.8rem;
+                font-size: 0.95rem;
+            }
+            .submit-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 0 1rem;
+            }
+            .footer-section {
+                margin-bottom: 1rem;
+            }
+            .footer-bottom {
+                font-size: 0.85rem;
+                padding-top: 1.5rem;
+                margin-top: 1.5rem;
+            }
+        }
+        /* Extra small devices */
+        
+        @media (max-width: 360px) {
+            .nav-container {
+                padding: 0 0.5rem;
+            }
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            .logo {
+                font-size: 0.85rem;
+            }
+            .nav-links a {
+                padding: 0.8rem 1rem;
+                font-size: 0.95rem;
+            }
+        }
+        /* Utility Classes */
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.jpg" alt="UrbanCityPortal Logo"> UrbanCityPortal
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Feedback</a></li>
+                <li><a href="chatbot.html">Chatbot</a></li>
+                <li><a href="Aboutus.html">About Us</a></li>
+                <li id="authLinkContainer"><a href="login.html" class="login-btn">Login</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>City Management & Community Engagement</h1>
+            <p>Report urban issues. Help us build a better city.</p>
+            <a href="report.html" class="cta-button" id="reportProblemCta">
+                <i class="fas fa-plus-circle"></i> Report a Problem
+            </a>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Report the Problem</h3>
+                    <p>Take a photo of the issue and provide details about the location and nature of the problem. Your report helps us understand what needs attention.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Track Status Updates</h3>
+                    <p>Monitor the progress of your report in real-time. Receive updates as our team reviews, assigns, and works on resolving the issue.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Get Notified When Resolved</h3>
+                    <p>Receive instant notifications when your reported issue has been resolved. See the difference you've made in your community.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Platform Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Photo Uploads</h4>
+                        <p>Easily upload photos to provide visual evidence of issues that need attention.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Real-Time Updates</h4>
+                        <p>Get live status updates on your reports and see progress as it happens.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Smart Notifications</h4>
+                        <p>Receive timely notifications about your reports and community updates.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Interactive Map View</h4>
+                        <p>Visualize reported issues and their status on an interactive city map.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Community Engagement</h4>
+                        <p>Connect with other residents and collaborate on city improvement initiatives.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Secure & Private</h4>
+                        <p>Your data is protected with enterprise-grade security and privacy measures.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact/Feedback Form Section -->
+    <section class="contact" id="contact">
+        <div class="contact-container">
+            <h2 class="section-title">Send Feedback</h2>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Issue Category</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select category</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="public-safety">Public Safety</option>
+                        <option value="environment">Environment</option>
+                        <option value="transportation">Transportation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Description</label>
+                    <textarea id="message" name="message" placeholder="Please provide details about the issue or your feedback..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>UrbanCityPortal</h4>
+                <p>Empowering communities through technology. Making cities better, one report at a time.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul style="list-style: none;">
+                    <li><a href="#home" style="color: #94a3b8; text-decoration: none;">Home</a></li>
+                    <li><a href="#how-it-works" style="color: #94a3b8; text-decoration: none;">How It Works</a></li>
+                    <li><a href="#features" style="color: #94a3b8; text-decoration: none;">Features</a></li>
+                    <li><a href="#contact" style="color: #94a3b8; text-decoration: none;">Report Issue</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                <p><i class="fas fa-envelope"></i> info@urbancityportal.gov</p>
+                <p><i class="fas fa-map-marker-alt"></i> 123 City Hall Drive, Downtown</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 UrbanCityPortal. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript for Interactive Features
+
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        navLinks.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                navLinks.classList.remove('active');
+                const icon = mobileMenuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-container')) {
+                navLinks.classList.remove('active');
+                const icon = mobileMenuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Form submission
+        const contactForm = document.getElementById('contactForm');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Get form data
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData);
+
+            // Simple validation
+            if (!data.name || !data.email || !data.message || !data.category) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            // Simulate form submission
+            const submitBtn = contactForm.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                alert('Thank you for your report! We will review it and get back to you soon.');
+                contactForm.reset();
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerHeight = document.getElementById('header').offsetHeight;
+                    const targetPosition = target.offsetTop - headerHeight - 20;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.step-card, .feature-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Add loading animation to page
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+
+        // Initialize page
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s ease';
+
+        // --- Login/Report Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const authLinkContainer = document.getElementById('authLinkContainer');
+            const loginBtn = authLinkContainer.querySelector('.login-btn');
+            const reportProblemCta = document.getElementById('reportProblemCta');
+            const contactReportLink = document.querySelector('a[href="#contact"]');
+
+            // Function to update UI based on login status
+            function updateUIForLoginStatus() {
+                const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+                if (isLoggedIn) {
+                    loginBtn.textContent = 'Dashboard';
+                    loginBtn.href = 'dashboard.html';
+                    if (reportProblemCta) reportProblemCta.style.display = 'inline-block';
+                    if (contactReportLink) contactReportLink.href = 'report.html';
+                } else {
+                    loginBtn.textContent = 'Login';
+                    loginBtn.href = 'login.html';
+                    if (reportProblemCta) reportProblemCta.style.display = 'inline-block';
+                    if (contactReportLink) contactReportLink.href = '#contact';
+                }
+            }
+
+            // Initial UI update
+            updateUIForLoginStatus();
+
+            // Handle report button clicks
+            if (reportProblemCta) {
+                reportProblemCta.addEventListener('click', (e) => {
+                    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+                    if (!isLoggedIn) {
+                        e.preventDefault();
+                        alert('Please log in to report a problem.');
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+        });
+
+        // Responsive navigation improvements
+        function handleResize() {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                const icon = mobileMenuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+    </script>
+    <!-- Supabase for Feedback Storage -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
+    <script>
+        // Supabase config
+        const SUPABASE_URL = 'https://srwqjtjrxzewaazvnalm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyd3FqdGpyeHpld2FhenZuYWxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2MzI0MjksImV4cCI6MjA3NDIwODQyOX0.1WoQp137dF-HHjph137_wz_h7-eOePXEbE9OZFMXy7c';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Feedback form handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contactForm');
+            if (!contactForm) return;
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const formData = new FormData(contactForm);
+                const name = formData.get('name');
+                const email = formData.get('email');
+                const category = formData.get('category');
+                const message = formData.get('message');
+                // Insert feedback into Supabase
+                const {
+                    error
+                } = await supabase.from('feedback').insert({
+                    name,
+                    email,
+                    category,
+                    message,
+                    created_at: new Date().toISOString()
+                });
+                if (error) {
+                    alert('Error submitting feedback. Please try again.');
+                } else {
+                    alert('Thank you for your feedback!');
+                    contactForm.reset();
+                }
+            });
+        });
+    </script>
+</body>
+
+
+</html>

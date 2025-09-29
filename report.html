@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report a Problem - UrbanCityPortal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.38.0/umd/supabase.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+        
+         :root {
+            --primary-blue: #2563eb;
+            --accent-green: #10b981;
+            --danger-red: #ef4444;
+            --warning-yellow: #f59e0b;
+            --success-green: #22c55e;
+            --text-light: #f8fafc;
+            --border-light: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(37, 99, 235, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 0.75rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header.scrolled {
+            background: rgba(37, 99, 235, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 1001;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-green);
+        }
+        
+        .back-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .main-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .report-form {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h3 {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+        
+        .required {
+            color: var(--danger-red);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .file-upload {
+            position: relative;
+            width: 100%;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 1rem;
+            border: 2px dashed var(--border-light);
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--accent-green);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .file-preview {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+        
+        .file-preview-item {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+        }
+        
+        .file-preview-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-preview-item .file-name {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            word-break: break-word;
+        }
+        
+        .priority-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .priority-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .priority-option label {
+            display: block;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid var(--border-light);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+        }
+        
+        .priority-option input[type="radio"]:checked+label {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .location-input {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .location-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .location-btn:hover {
+            background: #059669;
+        }
+        
+        .location-btn:disabled {
+            background: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .submit-btn {
+            background: var(--accent-green);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            background: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .success-message,
+        .error-message {
+            display: none;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .success-message {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--success-green);
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger-red);
+        }
+        
+        .success-message.show,
+        .error-message.show {
+            display: block;
+        }
+        
+        .progress-container {
+            display: none;
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--primary-blue);
+                flex-direction: column;
+                padding: 1rem 0;
+                gap: 0;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .nav-links a {
+                padding: 1rem 1.5rem;
+                width: 100%;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .main-content {
+                padding: 0 1rem;
+            }
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            .report-form {
+                padding: 1.5rem;
+            }
+            .location-input {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header" id="header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.jpg" alt="Logo"> UrbanCityPortal
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Feedback</a></li>
+                <li><a href="chatbot.html">Chatbot</a></li>
+                <li id="dashboardNav"><a href="login.html">Login</a></li>
+                <li><a href="Aboutus.html">About Us</a></li>
+            </ul>
+            <script>
+                // Show Dashboard button if logged in, else Login
+                document.addEventListener('DOMContentLoaded', function() {
+                    const dashboardNav = document.getElementById('dashboardNav');
+                    if (!dashboardNav) return;
+                    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+                    if (isLoggedIn) {
+                        dashboardNav.innerHTML = '<a href="dashboard.html">Dashboard</a>';
+                    } else {
+                        dashboardNav.innerHTML = '<a href="login.html">Login</a>';
+                    }
+                });
+            </script>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Report a Problem</h1>
+            <p>Help us improve your city by reporting issues that need attention</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle"></i>
+            <strong>Report submitted successfully!</strong>
+            <p id="successText"></p>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Error submitting report</strong>
+            <p id="errorText"></p>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Uploading...</div>
+        </div>
+
+        <form class="report-form" id="reportForm">
+            <div class="form-section">
+                <h3><i class="fas fa-user"></i> Personal Information</h3>
+                <div class="form-group">
+                    <label for="fullName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-exclamation-triangle"></i> Issue Details</h3>
+                <div class="form-group">
+                    <label for="category">Issue Category <span class="required">*</span></label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="infrastructure">Infrastructure (Roads, Bridges, Utilities)</option>
+                        <option value="public-safety">Public Safety (Lighting, Signs, Hazards)</option>
+                        <option value="environment">Environment (Waste, Pollution, Green Spaces)</option>
+                        <option value="transportation">Transportation (Traffic, Parking, Public Transit)</option>
+                        <option value="public-services">Public Services (Water, Sanitation, Emergency)</option>
+                        <option value="community">Community (Parks, Recreation, Events)</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="title">Issue Title <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" placeholder="Brief description of the issue" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Detailed Description <span class="required">*</span></label>
+                    <textarea id="description" name="description" placeholder="Please provide details..." required></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-flag"></i> Priority Level</h3>
+                <div class="priority-selector">
+                    <div class="priority-option">
+                        <input type="radio" id="priority-high" name="priority" value="high">
+                        <label for="priority-high"><i class="fas fa-exclamation-circle"></i><div>High</div></label>
+                    </div>
+                    <div class="priority-option">
+                        <input type="radio" id="priority-medium" name="priority" value="medium" checked>
+                        <label for="priority-medium"><i class="fas fa-clock"></i><div>Medium</div></label>
+                    </div>
+                    <div class="priority-option">
+                        <input type="radio" id="priority-low" name="priority" value="low">
+                        <label for="priority-low"><i class="fas fa-info-circle"></i><div>Low</div></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+                <div class="form-group">
+                    <label for="address">Address or Location <span class="required">*</span></label>
+                    <div class="location-input">
+                        <input type="text" id="address" name="address" placeholder="Enter the address" required>
+                        <button type="button" class="location-btn" id="getCurrentLocation">
+                            <i class="fas fa-crosshairs"></i> Use Current Location
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="landmarks">Nearby Landmarks (Optional)</label>
+                    <input type="text" id="landmarks" name="landmarks" placeholder="e.g., Near City Hall">
+                </div>
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-camera"></i> Photos (Optional but Recommended)</h3>
+                <div class="form-group">
+                    <div class="file-upload">
+                        <input type="file" id="photos" name="photos" accept="image/*" multiple>
+                        <label for="photos" class="file-upload-label" id="fileUploadLabel">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div>Click to upload photos or drag and drop</div>
+                            <small>PNG, JPG up to 5MB each (max 5 photos)</small>
+                        </label>
+                    </div>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit Report
+            </button>
+        </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://srwqjtjrxzewaazvnalm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyd3FqdGpyeHpld2FhenZuYWxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg2MzI0MjksImV4cCI6MjA3NDIwODQyOX0.1WoQp137dF-HHjph137_wz_h7-eOePXEbE9OZFMXy7c';
+        let supabase = null;
+        let selectedFiles = [];
+        let supabaseInitialized = false;
+
+        async function initializeSupabase() {
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    console.error('Supabase library not loaded');
+                    return false;
+                }
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const {
+                    data,
+                    error
+                } = await supabase.storage.listBuckets();
+                if (error) {
+                    console.error('Supabase connection test failed:', error);
+                    return false;
+                }
+                console.log('Supabase initialized successfully');
+                supabaseInitialized = true;
+                return true;
+            } catch (error) {
+                console.error('Failed to initialize Supabase:', error);
+                return false;
+            }
+        }
+
+        function generateReportId() {
+            return 'report_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function uploadFileToStorage(file, reportId, index) {
+            if (!supabase || !supabaseInitialized) {
+                throw new Error('Supabase not initialized');
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error(`File ${file.name} exceeds 5MB`);
+            }
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!allowedExts.includes(fileExt)) {
+                throw new Error(`File type .${fileExt} not supported`);
+            }
+            const timestamp = Date.now();
+            const fileName = `${reportId}_${index}_${timestamp}.${fileExt}`;
+            console.log('Uploading:', fileName);
+            const {
+                data,
+                error
+            } = await supabase.storage
+                .from('report-images')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: file.type
+                });
+            if (error) throw new Error(`Upload failed: ${error.message}`);
+            const {
+                data: publicUrlData
+            } = supabase.storage
+                .from('report-images')
+                .getPublicUrl(fileName);
+            return {
+                path: fileName,
+                url: publicUrlData.publicUrl,
+                fileName: file.name,
+                fileSize: file.size
+            };
+        }
+
+        async function saveReportToDatabase(reportData, imageUrls = []) {
+            if (!supabase || !supabaseInitialized) {
+                throw new Error('Supabase not initialized');
+            }
+            const imageUrlsArray = imageUrls.map(img => img.url || img);
+            const reportRecord = {
+                id: reportData.id,
+                full_name: reportData.fullName,
+                email: reportData.email,
+                phone: reportData.phone || null,
+                category: reportData.category,
+                title: reportData.title,
+                description: reportData.description,
+                priority: reportData.priority,
+                address: reportData.address,
+                landmarks: reportData.landmarks || null,
+                latitude: reportData.latitude ? parseFloat(reportData.latitude) : null,
+                longitude: reportData.longitude ? parseFloat(reportData.longitude) : null,
+                images: imageUrlsArray,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            };
+            const {
+                data,
+                error
+            } = await supabase
+                .from('reports')
+                .insert([reportRecord])
+                .select();
+            if (error) throw new Error(`Database insert failed: ${error.message}`);
+            console.log('Report saved:', data);
+            return data;
+        }
+
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                showErrorMessage('Geolocation not supported');
+                return;
+            }
+            const btn = document.getElementById('getCurrentLocation');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting...';
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use Current Location';
+                },
+                (error) => {
+                    showErrorMessage('Unable to get location: ' + error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use Current Location';
+                }
+            );
+        }
+
+        function handleFileSelect(files) {
+            selectedFiles = Array.from(files).slice(0, 5);
+            const preview = document.getElementById('filePreview');
+            preview.innerHTML = '';
+            selectedFiles.forEach((file) => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'file-preview-item';
+                    div.innerHTML = `<img src="${e.target.result}" alt="Preview"><div class="file-name">${file.name}</div>`;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+            const icon = document.getElementById('mobileMenuToggle').querySelector('i');
+            icon.className = navLinks.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+        }
+
+        function handleScroll() {
+            const header = document.getElementById('header');
+            header.classList.toggle('scrolled', window.scrollY > 10);
+        }
+
+        function showSuccessMessage(reportId, isOffline = false) {
+            hideMessages();
+            const msg = document.getElementById('successMessage');
+            const text = document.getElementById('successText');
+            text.innerHTML = isOffline ?
+                `Report saved locally!<br><strong>Report ID: ${reportId}</strong><br>Will sync when online.` :
+                `Thank you!<br><strong>Report ID: ${reportId}</strong><br>We'll review your report soon.`;
+            msg.classList.add('show');
+            msg.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function showErrorMessage(message) {
+            hideMessages();
+            const msg = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = message;
+            msg.classList.add('show');
+            msg.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function hideMessages() {
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+
+        function updateProgress(percent, text) {
+            const container = document.getElementById('progressContainer');
+            const fill = document.getElementById('progressFill');
+            const textEl = document.getElementById('progressText');
+            if (percent === 0) {
+                container.style.display = 'none';
+            } else {
+                container.style.display = 'block';
+                fill.style.width = `${percent}%`;
+                textEl.textContent = text;
+            }
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            hideMessages();
+            const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('reportForm');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                const formData = new FormData(form);
+                const reportId = generateReportId();
+                const reportData = {
+                    id: reportId,
+                    fullName: formData.get('fullName'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    category: formData.get('category'),
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    priority: formData.get('priority'),
+                    address: formData.get('address'),
+                    landmarks: formData.get('landmarks'),
+                    latitude: formData.get('latitude'),
+                    longitude: formData.get('longitude')
+                };
+
+                if (!reportData.fullName || !reportData.email || !reportData.category ||
+                    !reportData.title || !reportData.description || !reportData.address) {
+                    showErrorMessage('Please fill in all required fields');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Report';
+                    return;
+                }
+
+                let imageUrls = [];
+                if (selectedFiles.length > 0 && supabaseInitialized) {
+                    updateProgress(10, 'Uploading images...');
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        try {
+                            const imageData = await uploadFileToStorage(selectedFiles[i], reportId, i);
+                            imageUrls.push(imageData);
+                            const progressPercent = 10 + ((i + 1) / selectedFiles.length) * 40;
+                            updateProgress(progressPercent, `Uploaded image ${i + 1} of ${selectedFiles.length}...`);
+                        } catch (error) {
+                            console.error('Image upload error:', error);
+                            showErrorMessage(`Error uploading image ${i + 1}: ${error.message}`);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Report';
+                            return;
+                        }
+                    }
+                }
+
+                updateProgress(60, 'Saving report...');
+                const report = await saveReportToDatabase(reportData, imageUrls);
+                updateProgress(100, 'Report submitted!');
+                showSuccessMessage(reportId);
+                form.reset();
+                selectedFiles = [];
+                document.getElementById('filePreview').innerHTML = '';
+            } catch (error) {
+                console.error('Submit error:', error);
+                showErrorMessage('Error submitting report: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Report';
+            }
+        }
+
+        document.getElementById('reportForm').addEventListener('submit', handleSubmit);
+        document.getElementById('getCurrentLocation').addEventListener('click', getCurrentLocation);
+        document.getElementById('photos').addEventListener('change', (e) => handleFileSelect(e.target.files));
+        document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileMenu);
+        window.addEventListener('scroll', handleScroll);
+
+        initializeSupabase();
+    </script>
+</body>
+
+</html>
